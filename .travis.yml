@@ -13,25 +13,25 @@ deploy_service_job: &DEPLOY_SERVICE_JOB
 
   script:
     - npm test
-  #   - serverless deploy -s ${STAGE_NAME}
+    - serverless deploy -s ${STAGE_NAME}
 
-remove_service_job: &REMOVE_SERVICE_JOB
-  cache:
-    directories:
-      - node_modules
-      - ${SERVICE_PATH}/node_modules
+# remove_service_job: &REMOVE_SERVICE_JOB
+#   cache:
+#     directories:
+#       - node_modules
+#       - ${SERVICE_PATH}/node_modules
 
-  install:
-    - npm install -g serverless
-    - travis_retry npm install
-    - cd ${SERVICE_PATH}
-    - travis_retry npm install
-    - cd -
+#   install:
+#     - npm install -g serverless
+#     - travis_retry npm install
+#     - cd ${SERVICE_PATH}
+#     - travis_retry npm install
+#     - cd -
 
-  script:
-    - cd ${SERVICE_PATH}
-    # - serverless remove -s ${STAGE_NAME}
-    - cd -
+#   script:
+#     - cd ${SERVICE_PATH}
+#     # - serverless remove -s ${STAGE_NAME}
+#     - cd -
 
 environments:
   - &PRODUCTION_ENV
@@ -47,7 +47,7 @@ jobs:
     # non-master branches deploys to stage named by the branch
     - <<: *DEPLOY_SERVICE_JOB
       name: "Deploy Users API"
-      if: tag !~ /^rm-stage-.* / AND type = push AND NOT branch = master
+      if: tag !~ /^rm-stage-.* / AND type = push AND NOT branch = main
       env:
         - SERVICE_PATH="services/users-api"
         - STAGE_NAME=${TRAVIS_BRANCH}
@@ -91,13 +91,13 @@ jobs:
     #     - *DEVELOPMENT_ENV
 
     # master branch deploys to the 'prod' stage
-    # - <<: *DEPLOY_SERVICE_JOB
-    #   name: "Deploy Users API"
-    #   if: tag !~ /^rm-stage-.* / AND type = push AND branch = master
-    #   env:
-    #     - SERVICE_PATH="services/users-api"
-    #     - STAGE_NAME=prod
-    #     - *PRODUCTION_ENV
+    - <<: *DEPLOY_SERVICE_JOB
+      name: "Deploy Users API"
+      if: tag !~ /^rm-stage-.* / AND type = push AND branch = main
+      env:
+        - SERVICE_PATH="services/users-api"
+        - STAGE_NAME=prod
+        - *PRODUCTION_ENV
     # - <<: *DEPLOY_SERVICE_JOB
     #   name: "Deploy Posts API"
     #   if: tag !~ /^rm-stage-.* / AND type = push AND branch = master
