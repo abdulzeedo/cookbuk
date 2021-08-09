@@ -1,0 +1,22 @@
+{
+  "name": "cookbuk-prod",
+  "version": "1.0.0",
+  "description": "Test CI/CD",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdulzeedo/cookbuk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdulzeedo/cookbuk/issues"
+  },
+  "homepage": "https://github.com/abdulzeedo/cookbuk#readme",
+  "dependencies": {
+    "mocha": "^9.0.3"
+  }
+}
