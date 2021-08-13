@@ -1,0 +1,98 @@
+org: abdulzeedo
+app: cookbuk
+service: cookbuk
+
+frameworkVersion: '2'
+
+custom:
+  userTableName: 'users-table-${self:provider.stage}'
+  recipeTableName: 'recipes-table-${self:provider.stage}'
+  dynamodb:
+      stages:
+          - dev
+      start:
+          port: 8000
+          migrate: true
+      migration:
+          dir: offline/migrations
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: '20201221'
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, Arn ]
+            - Fn::GetAtt: [ RecipesTable, Arn ]
+  environment:
+    USERS_TABLE: ${self:custom.userTableName}
+    RECIPES_TABLE: ${self:custom.recipeTableName}
+
+functions:
+  # api:
+  #   handler: src/RecipesLambda.handler
+  #   timeout: 1 # seconds
+  #   memorySize: 128 # mb
+  #   events:
+  #     - http:
+  #         path: /
+  #         method: ANY
+  #     - http:
+  #         path: /{proxy+}
+  #         method: ANY
+  api:
+    handler: src/RecipesLambda.handler
+    timeout: 1 # seconds
+    memorySize: 128 # mb
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-dynamodb-local
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.userTableName}
+    RecipesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: recipeId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: recipeId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.recipeTableName}
