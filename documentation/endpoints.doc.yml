@@ -1,0 +1,47 @@
+documentation:
+  version: '1'
+  title: 'Recipe API'
+  description: 'Recipe Restful API'
+  models:
+    - name: "ErrorResponse"
+      description: "This is an error"
+      contentType: "application/json"
+      schema: ${file(documentation/models/ErrorResponse.json)}
+    - name: "RecipesResponse"
+      description: "An array of recipes"
+      contentType: "application/json"
+      schema: ${file(documentation/models/RecipesResponse.json)}
+    - name: "CreateRecipeResponse"
+      description: "Create a new recipe"
+      contentType: "application/json"
+      schema: ${file(documentation/models/CreateRecipeResponse.json)}
+
+endpoints:
+  getRecipes:
+    summary: "Get all Recipes"
+    description: "Gets all the stored Recipes"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: "An array of recipes"
+        responseModels:
+          application/json: "RecipesResponse"
+      - statusCode: 500
+        responseBody:
+          description: "An internal error occurred"
+        responseModels:
+          application/json: "ErrorResponse"
+  createRecipe:
+    summary: "Create a recipe"
+    description: "Create a new recipe"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: "Create a recipe"
+        responseModels:
+          application/json: "CreateRecipeResponse"
+      - statusCode: 500
+        responseBody:
+          description: "An internal error occurred"
+        responseModels:
+          application/json: "ErrorResponse"

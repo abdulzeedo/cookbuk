@@ -4,6 +4,7 @@ service: cookbuk
 frameworkVersion: '2'
 
 custom:
+  documentation: ${file(documentation/endpoints.doc.yml):documentation}
   userTableName: 'users-table-${self:provider.stage}'
   recipeTableName: 'recipes-table-${self:provider.stage}'
   dynamodb:
@@ -39,33 +40,34 @@ provider:
     RECIPES_TABLE: ${self:custom.recipeTableName}
 
 functions:
-  # api:
-  #   handler: src/RecipesLambda.handler
-  #   timeout: 1 # seconds
-  #   memorySize: 128 # mb
-  #   events:
-  #     - http:
-  #         path: /
-  #         method: ANY
-  #     - http:
-  #         path: /{proxy+}
-  #         method: ANY
   api:
     handler: src/RecipesLambda.handler
     timeout: 1 # seconds
     memorySize: 128 # mb
     events:
       - http:
-          path: /
-          method: ANY
+          path: /recipes
+          method: POST
+          authorizer:
+            arn: arn:aws:cognito-idp:us-east-1:820439974556:userpool/us-east-1_QhoI0fvqu
+          documentation: ${file(documentation/endpoints.doc.yml):endpoints.createRecipe}
+      - http:
+          path: /recipes
+          method: GET
+          authorizer:
+            arn: arn:aws:cognito-idp:us-east-1:820439974556:userpool/us-east-1_QhoI0fvqu
+          documentation: ${file(documentation/endpoints.doc.yml):endpoints.getRecipes}
       - http:
           path: /{proxy+}
           method: ANY
+          authorizer:
+            arn: arn:aws:cognito-idp:us-east-1:820439974556:userpool/us-east-1_QhoI0fvqu
 
 plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-dynamodb-local
+  - serverless-openapi-documentation
 
 resources:
   Resources:
