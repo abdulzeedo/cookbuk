@@ -31,7 +31,7 @@ app.get("/recipes", async function (req, res) {
       "#u_id": "userId"
     },
     ExpressionAttributeValues: {
-        ":id": "google_113200800594518319852"
+        ":id": req.userId
     }
   };
   console.log(params);
