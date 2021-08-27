@@ -2,3 +2,7 @@ node_modules
 .DS_Store
 .src/DS_Store
 openapi.yml
+.dynamodb
+.dynamodb/*
+.serverless
+.serverless/*

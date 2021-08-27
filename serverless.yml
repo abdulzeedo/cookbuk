@@ -4,9 +4,9 @@ service: cookbuk
 frameworkVersion: '2'
 
 custom:
-  documentation: ${file(documentation/endpoints.doc.yml):documentation}
+  # documentation: ${file(documentation/endpoints.doc.yml):documentation}
   userTableName: 'users-table-${self:provider.stage}'
-  recipeTableName: 'recipes-table-${self:provider.stage}'
+  recipeTableName: 'recipes-table1-${self:provider.stage}'
   dynamodb:
       stages:
           - dev
@@ -50,13 +50,13 @@ functions:
           method: POST
           authorizer:
             arn: arn:aws:cognito-idp:us-east-1:820439974556:userpool/us-east-1_QhoI0fvqu
-          documentation: ${file(documentation/endpoints.doc.yml):endpoints.createRecipe}
+          # documentation: ${file(documentation/endpoints.doc.yml):endpoints.createRecipe}
       - http:
           path: /recipes
           method: GET
           authorizer:
             arn: arn:aws:cognito-idp:us-east-1:820439974556:userpool/us-east-1_QhoI0fvqu
-          documentation: ${file(documentation/endpoints.doc.yml):endpoints.getRecipes}
+          # documentation: ${file(documentation/endpoints.doc.yml):endpoints.getRecipes}
       - http:
           path: /{proxy+}
           method: ANY
@@ -67,7 +67,7 @@ plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-dynamodb-local
-  - serverless-openapi-documentation
+  # - serverless-openapi-documentation
 
 resources:
   Resources:
@@ -90,9 +90,27 @@ resources:
         AttributeDefinitions:
           - AttributeName: recipeId
             AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: recipeTitle
+            AttributeType: S
         KeySchema:
           - AttributeName: recipeId
             KeyType: HASH
+          - AttributeName: userId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: userIndex
+            KeySchema: 
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: recipeTitle
+                KeyType: RANGE
+            Projection: 
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
